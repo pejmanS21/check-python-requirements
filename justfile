@@ -1,11 +1,16 @@
 alias gr := get-reqs
-alias cr := check-reqs
+alias cer := check-extra-reqs
+alias cerd := check-extra-reqs-default
 
-# Get list of imported packages in python scripts with local installed packages
+# Get list of imported packages in python scripts
 get-reqs SRC:
-    pipreqs {{SRC}} --mode no-pin --savepath requirements-project.txt --use-local --force
+    pipreqs {{SRC}} --mode no-pin --savepath requirements-project.txt --force
 
-# Check list of imported libraries from `get-reqs` with user defined requirements.txt
-check-reqs SRC:
-    pipreqs {{SRC}} --mode no-pin --savepath requirements-project.txt --use-local --force
-    pipreqs --savepath requirements-project.txt --diff requirements.txt --use-local
+# Get extra requirements from extracted requirements
+check-extra-reqs SRC:
+    just get-reqs {{SRC}}
+    pip-extra-reqs --requirements-file requirements-project.txt {{SRC}} -v
+
+# Get extra requirements from user requirements.txt
+check-extra-reqs-default SRC:
+    pip-extra-reqs --requirements-file requirements.txt {{SRC}} -v
